@@ -1,0 +1,2 @@
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --new-window "https://docs.snowflake.com/ja/learn-tutorials"
+start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --new-window "https://app.snowflake.com/us-east-1/gqc24765/#/compute/warehouses?whtype=all&status=all&size=all&columns=name%2Cstatus%2Csize%2Ctype%2Cclusters%2Crunning%2Cqueued%2Cowner%2ClastResumedTime%2CresourceConstraint"
