@@ -1,0 +1,35 @@
+module:
+  iam_role: AWS\modules\iam_role
+  s3_bucket: AWS\modules\s3_bucket
+  db: snowflake\modules\account_obj\db
+  grant: snowflake\modules\account_obj\grant
+  role: snowflake\modules\account_obj\role
+  storage_integration: snowflake\modules\account_obj\storage_integration
+  user: snowflake\modules\account_obj\user
+  warehouses: snowflake\modules\account_obj\warehouses
+  schema: snowflake\modules\database_obj\test_db\schema
+  file_formats: snowflake\modules\schema_obj\pipe_obj\file_formats
+  snowpipe: snowflake\modules\schema_obj\pipe_obj\snowpipe
+  stage: snowflake\modules\schema_obj\stage
+  table: snowflake\modules\schema_obj\table
+  env: test\env
+  mod: test\mod
+terragrunt:
+  iam_role: AWS\envs\dev\iam_role
+  prod: AWS\envs\prod
+  s3: AWS\envs\prod\s3
+  envs: snowflake\envs
+  dev: snowflake\envs\dev
+  db: snowflake\envs\dev\account_obj\db
+  grant: snowflake\envs\dev\account_obj\grant
+  role: snowflake\envs\dev\account_obj\role
+  storage_integration: snowflake\envs\dev\account_obj\storage_integration
+  user: snowflake\envs\dev\account_obj\user
+  warehouses: snowflake\envs\dev\account_obj\warehouses
+  test_db: snowflake\envs\dev\schema_obj\test_db
+  test_schema: snowflake\envs\dev\schema_obj\test_db\test_schema
+  test_format: snowflake\envs\dev\schema_obj\test_db\test_schema\pipe_obj\file_formats\test_format
+  test_pipe: snowflake\envs\dev\schema_obj\test_db\test_schema\pipe_obj\snowpipe\test_pipe
+  test_stage: snowflake\envs\dev\schema_obj\test_db\test_schema\stage\test_stage
+  test_table: snowflake\envs\dev\schema_obj\test_db\test_schema\table\test_table
+  env: test\env
