@@ -8,5 +8,5 @@ terraform {
 }
 
 inputs = {
-  base_path = "${local.root_folder}\\${local.relative_path_from_route.terragrunt.db}"
+  base_path = "${local.root_folder}/${local.relative_path_from_route.terragrunt.dev.db}"
 }

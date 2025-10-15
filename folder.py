@@ -1,28 +1,50 @@
 import os
 import yaml
-from collections import OrderedDict
 
-# スクリプトのあるディレクトリを root とする
 root_path = os.path.dirname(os.path.abspath(__file__))
 
+# module は単純に格納
 modules = {}
-terragrunts = {}
+# terragrunt は env ごとに格納
+terragrunts = {"dev": {}, "prod": {}}
 
 for dirpath, dirnames, filenames in os.walk(root_path):
-    # .で始まるフォルダを無視
     dirnames[:] = [d for d in dirnames if not d.startswith(".")]
 
     folder_name = os.path.basename(dirpath)
     rel_path = os.path.relpath(dirpath, root_path)
 
-    if any(f.endswith(".tf") for f in filenames):
-        modules[folder_name] = rel_path
-    if any(f.endswith(".hcl") for f in filenames):
-        terragrunts[folder_name] = rel_path
+    # パス区切りを / に統一
+    rel_path = rel_path.replace(os.sep, "/")
 
-# value（パス）順にソートした OrderedDict を普通の dict に変換
-modules_sorted = {k: v for k, v in sorted(modules.items(), key=lambda x: x[1])}
-terragrunts_sorted = {k: v for k, v in sorted(terragrunts.items(), key=lambda x: x[1])}
+    # module 側: main.tf がある場合のみ
+    if "main.tf" in filenames:
+        modules[folder_name] = rel_path
+
+    # terragrunt 側: terragrunt.hcl がある場合のみ
+    if "terragrunt.hcl" in filenames:
+        env_key = None
+        for key in ["dev", "env", "prod"]:
+            if key in rel_path.split("/"):  # os.sep → "/" に変更
+                env_key = key
+                break
+        if env_key:
+            terragrunts[env_key][folder_name] = rel_path
+        else:
+            terragrunts.setdefault("others", {})[folder_name] = rel_path
+
+# value（パス）でソート
+def sort_dict_by_value(d):
+    sorted_dict = {}
+    for k, v in sorted(d.items(), key=lambda x: x[1] if not isinstance(x[1], dict) else ""):
+        if isinstance(v, dict):
+            sorted_dict[k] = sort_dict_by_value(v)
+        else:
+            sorted_dict[k] = v
+    return sorted_dict
+
+modules_sorted = sort_dict_by_value(modules)
+terragrunts_sorted = sort_dict_by_value(terragrunts)
 
 output = {
     "module": modules_sorted,

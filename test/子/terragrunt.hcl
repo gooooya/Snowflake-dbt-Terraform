@@ -3,7 +3,7 @@ locals {
 }
 
 inputs = {
-  root = "${local.parent.root_folder}\\${local.parent.relative_path_from_route.terragrunt.db}"
+  root = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.db}"
 }
 
 terraform {

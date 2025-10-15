@@ -9,12 +9,12 @@ locals {
 
 
 terraform {
-  source = "${local.parent.root_folder}\\${local.parent.relative_path_from_route.module.storage_integration}"
+  source = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.storage_integration}"
 }
 
 dependency "s3" {
-  config_path = "${local.parent.root_folder}\\${local.parent.relative_path_from_route.terragrunt.dev.snowbucket}"
-  
+  config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowbucket}"
+
   mock_outputs = {
     original_s3_url = "s3://aws_s3_bucket.snow_bucket.bucket"
   }
