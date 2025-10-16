@@ -1,0 +1,2 @@
+IAM:
+  role_name: "S3ToStorage_integration"

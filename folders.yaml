@@ -1,0 +1,39 @@
+module:
+  iam_role: AWS/modules/iam_role
+  s3_bucket: AWS/modules/s3_bucket
+  S3_storage_integration: snowflake/modules/account_obj/S3_storage_integration
+  account_grants: snowflake/modules/account_obj/account_grants
+  account_role: snowflake/modules/account_obj/account_role
+  db: snowflake/modules/account_obj/db
+  user: snowflake/modules/account_obj/user
+  warehouses: snowflake/modules/account_obj/warehouses
+  database_grants: snowflake/modules/database_obj/database_grants
+  database_roles: snowflake/modules/database_obj/database_roles
+  schema: snowflake/modules/database_obj/schema
+  file_formats: snowflake/modules/schema_obj/pipe_obj/file_formats
+  snowpipe_manual: snowflake/modules/schema_obj/pipe_obj/snowpipe_manual
+  stage: snowflake/modules/schema_obj/stage
+  table: snowflake/modules/schema_obj/table
+  test: test
+  子: test/子
+terragrunt:
+  dev:
+    snowflake_role_dev: AWS/envs/dev/iam_role/snowflake_role_dev
+    snowbucket: AWS/envs/dev/s3/snowbucket
+    account_roles: snowflake/envs/dev/account_obj/account_roles
+    db: snowflake/envs/dev/account_obj/db
+    storage_integration: snowflake/envs/dev/account_obj/storage_integration
+    user: snowflake/envs/dev/account_obj/user
+    warehouses: snowflake/envs/dev/account_obj/warehouses
+    database_grants: snowflake/envs/dev/database_obj/database_grants
+    database_roles: snowflake/envs/dev/database_obj/database_roles
+    schema: snowflake/envs/dev/database_obj/schema
+    test_format: snowflake/envs/dev/schema_obj/test_db/test_schema/pipe_obj/file_formats/test_format
+    test_pipe: snowflake/envs/dev/schema_obj/test_db/test_schema/pipe_obj/snowpipe/test_pipe
+    test_stage: snowflake/envs/dev/schema_obj/test_db/test_schema/stage/test_stage
+    test_table: snowflake/envs/dev/schema_obj/test_db/test_schema/table/test_table
+  prod:
+    s3: AWS/envs/prod/s3
+  others:
+    test: test
+    子: test/子
