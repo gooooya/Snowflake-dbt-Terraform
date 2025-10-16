@@ -22,7 +22,7 @@ dependency "s3" {
   config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowbucket}"
 
   mock_outputs = {
-    bucket_url = "S3://XXXXX"
+    original_s3_url = "S3://XXXXX"
   }
 }
 
@@ -33,6 +33,6 @@ inputs = {
     schema = local.ns_vars.stage.schema
     storage_integration = local.ns_vars.stage.storage_integration
     encryption = local.ns_vars.stage.encryption
-    s3_url = dependency.s3.outputs.bucket_url
+    s3_url = dependency.s3.outputs.original_s3_url
   }
 }

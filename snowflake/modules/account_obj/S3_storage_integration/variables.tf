@@ -5,5 +5,6 @@ variable "storage_integration" {
     storage_provider = string
     enabled = bool
     storage_allowed_locations  = list(string)
+    role_name = string
   })
 }

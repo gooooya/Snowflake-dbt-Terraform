@@ -8,7 +8,7 @@ locals {
 }
 
 terraform {
-  source =  "${local.parent.root_folder}\\${local.parent.relative_path_from_route.module.s3_bucket}"
+  source =  "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.s3_bucket}"
 }
 
 inputs = {

@@ -8,11 +8,18 @@ generate "provider" {
   if_exists = "overwrite"
   contents  = <<EOF
 provider "snowflake" {
-  account_name  = "${get_env("SNOWFLAKE_ACCOUNT", "")}"  
+  account_name  = "${get_env("SNOWFLAKE_ACCOUNT_NAME", "")}"  
   organization_name  = "${get_env("SNOWFLAKE_ORGANIZATION_NAME", "")}"
   user = "${get_env("SNOWFLAKE_USER", "")}"
   password = "${get_env("SNOWFLAKE_PASSWORD", "")}"
-  role     = "${get_env("SNOWFLAKE_ROLE", "")}"
+  role = "${get_env("SNOWFLAKE_ROLE", "")}"
+  preview_features_enabled = [
+    "snowflake_table_resource",
+    "snowflake_storage_integration_resource",
+    "snowflake_file_format_resource",
+    "snowflake_stage_resource",
+    "snowflake_pipe_resource"
+  ]
  }
 
 EOF

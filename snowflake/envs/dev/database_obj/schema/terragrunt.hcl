@@ -11,6 +11,12 @@ terraform {
   source = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.schema}"
 }
 
+dependencies {
+  paths = [
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.db}",
+   ]
+}
+
 inputs = {
   relation = flatten([
     for r in local.ns_vars.databases : [

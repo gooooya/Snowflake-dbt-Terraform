@@ -11,7 +11,7 @@ resource "snowflake_pipe" "pipe" {
     schema = each.value.schema
     target_table = each.value.target_table
     stage_name = each.value.stage_name
-    target_format = each.value.target_format
+    target_format_name = each.value.target_format_name
   })
 }
 

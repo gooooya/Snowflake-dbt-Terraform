@@ -1,9 +1,19 @@
+IAM:
+  role_name: "S3ToStorage_integration"
+# TODO:大域変数みたいな使い方したくないが、DRY優先とするならrootにおく？ファイル名namespace_vars_dev.yamlとかにしてやればよさそう
+
 warehouses:
   - name: "TEST_WAREHOUSES"
     warehouse_size: "XSMALL"
     auto_suspend: 60
     auto_resume: true
     initially_suspended: true
+
+storage_integration:
+  name: "TEST_STORAGE_INTEGRATION"
+  type: "EXTERNAL_STAGE"
+  storage_provider: "S3"
+  enabled: true
 
 stage:
   name: "TEST_STAGE"
@@ -27,7 +37,7 @@ pipes:
     stage_name: "TEST_STAGE"
     target_table: "TEST_TABLE"
     sql_file_name: "copy_statement.sql"
-    target_format: "TEST_FORMAT"
+    target_format_name: "TEST_FORMAT"
 
 databases:
   - name: "TEST_DB"
@@ -44,12 +54,6 @@ tables:
         type: "string"
       - name: "B"
         type: "string"
-
-storage_integrations:
-  name: "TEST_STORAGE_INTEGRATION"
-  type: "EXTERNAL_STAGE"
-  storage_provider: "S3"
-  enabled: true
 
 # TODO:ユーザ、ロール系切り離してもいいかも
 users:

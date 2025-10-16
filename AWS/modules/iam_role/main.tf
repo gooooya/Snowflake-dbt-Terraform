@@ -28,10 +28,13 @@ resource "aws_iam_policy" "s3_policy" {
       {
         Effect = "Allow",
         Action = [
-          "s3:GetBucketLocation",
+          "s3:PutObject",
           "s3:GetObject",
           "s3:GetObjectVersion",
-          "s3:ListBucket"
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion",   
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
         ],
         Resource = [
           var.bucket_arn,
@@ -43,6 +46,6 @@ resource "aws_iam_policy" "s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy" {
-  role       = aws_iam_role.snowflake_role.name
+  role = aws_iam_role.snowflake_role.name
   policy_arn = aws_iam_policy.s3_policy.arn
 }

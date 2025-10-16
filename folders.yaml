@@ -1,10 +1,10 @@
 module:
   iam_role: AWS/modules/iam_role
   s3_bucket: AWS/modules/s3_bucket
+  S3_storage_integration: snowflake/modules/account_obj/S3_storage_integration
   account_grants: snowflake/modules/account_obj/account_grants
   account_role: snowflake/modules/account_obj/account_role
   db: snowflake/modules/account_obj/db
-  storage_integration: snowflake/modules/account_obj/storage_integration
   user: snowflake/modules/account_obj/user
   warehouses: snowflake/modules/account_obj/warehouses
   database_grants: snowflake/modules/database_obj/database_grants

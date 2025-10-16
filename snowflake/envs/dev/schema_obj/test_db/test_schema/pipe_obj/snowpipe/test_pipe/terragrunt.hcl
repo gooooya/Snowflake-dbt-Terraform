@@ -17,6 +17,7 @@ dependencies {
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.test_stage}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.test_table}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.test_format}",
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowflake_role_dev}",
   ]
 }
 
@@ -30,7 +31,7 @@ inputs = {
       auto_ingest = p.auto_ingest
       stage_name = p.stage_name
       target_table = p.target_table
-      target_format = p.target_format
+      target_format_name = p.target_format_name
       sql_file_name = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.snowpipe_manual}/sql/${p.sql_file_name}"
     }
   ]

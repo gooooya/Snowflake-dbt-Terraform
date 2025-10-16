@@ -11,6 +11,12 @@ terraform {
   source = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.table}"
 }
 
+dependencies {
+  paths = ["${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.db}", 
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.schema}",
+  ]
+}
+
 inputs = {
   relation = local.ns_vars.tables
 }

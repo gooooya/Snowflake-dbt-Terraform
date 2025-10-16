@@ -8,6 +8,6 @@ variable "relation" {
     stage_name = string
     target_table = string
     sql_file_name = string
-    target_format = string
+    target_format_name = string
   }))
 }
