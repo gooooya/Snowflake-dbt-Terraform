@@ -5,6 +5,8 @@ module:
   account_grants: snowflake/modules/account_obj/account_grants
   account_role: snowflake/modules/account_obj/account_role
   db: snowflake/modules/account_obj/db
+  grants_ownership: snowflake/modules/account_obj/grants_ownership
+  rsa_user: snowflake/modules/account_obj/rsa_user
   user: snowflake/modules/account_obj/user
   warehouses: snowflake/modules/account_obj/warehouses
   database_grants: snowflake/modules/database_obj/database_grants
@@ -22,6 +24,8 @@ terragrunt:
     snowbucket: AWS/envs/dev/s3/snowbucket
     account_roles: snowflake/envs/dev/account_obj/account_roles
     db: snowflake/envs/dev/account_obj/db
+    grants_ownership: snowflake/envs/dev/account_obj/grants_ownership
+    rsa_user: snowflake/envs/dev/account_obj/rsa_user
     storage_integration: snowflake/envs/dev/account_obj/storage_integration
     user: snowflake/envs/dev/account_obj/user
     warehouses: snowflake/envs/dev/account_obj/warehouses

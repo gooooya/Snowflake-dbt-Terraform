@@ -61,14 +61,39 @@ users:
   - name: "DEV1"
   - name: "DEV2"
 
-database_grunts:
+rsa_user:
+  - name: "AIRFLOW"
+    login_name:  "Aiflow"
+    rsa_public_key: "rsa_key.pub"
+    default_role: "AIRFLOW"
+    default_warehouse: "TEST_WAREHOUSES"
+    default_namespace: "TEST_DB.TEST_SCHEMA"
+# rsa_public_keyはrootにある想定。場所帰るなら相対パスにすれば行けると思う。
+# https://docs.snowflake.com/ja/user-guide/key-pair-auth
+
+database_grants:
   - database_role_name: "DB_READ_ROLE"
     database_name: "TEST_DB"
     comment: "test"
     in_schema: "TEST_SCHEMA"
-    object_type_plural: "TABLES"
-    privileges:
-      - "SELECT"
+    object_privileges: 
+      TABLES:
+        - SELECT
+  - database_role_name: "AIRFLOW_EXECUTE_PIPE"
+    database_name: "TEST_DB"
+    comment: "Airflow_execute_pipe"
+    in_schema: "TEST_SCHEMA"
+    object_privileges: 
+      TABLES:
+        - SELECT
+        - INSERT
+      STAGES:
+        - USAGE # 外部ステージ(S3)のため
+
+grants_ownership:
+  - object_type: "PIPE"
+    object_name: "TEST_DB.TEST_SCHEMA.TEST_PIPE"
+    account_role_name: "AIRFLOW"
 
 account_roles:
   - name: "ANALYST_ROLE"
@@ -77,3 +102,9 @@ account_roles:
       - database: "TEST_DB"
         names:
         - "DB_READ_ROLE"
+  - name: "AIRFLOW"
+    comment: "Airflow only"
+    grants_database_roles:
+      - database: "TEST_DB"
+        names:
+        - "AIRFLOW_EXECUTE_PIPE"

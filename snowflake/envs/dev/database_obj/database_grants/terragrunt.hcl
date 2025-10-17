@@ -29,5 +29,16 @@ inputs = {
       ]
     ]
   ])
-  grants =local.ns_vars.database_grunts
+
+  grants = flatten([
+    for g in local.ns_vars.database_grants : [
+      for obj_type, priv_list in g.object_privileges : {
+        database_role_name = g.database_role_name
+        database_name = g.database_name
+        in_schema = g.in_schema
+        object_type_plural = obj_type
+        privileges = priv_list
+      }
+    ]
+  ])
 }

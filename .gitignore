@@ -1,0 +1,8 @@
+.*
+!.gitignore
+_*
+Airflow/config/
+Airflow/logs/
+Airflow/plugins/
+rsa_key.p8
+rsa_key.pub
