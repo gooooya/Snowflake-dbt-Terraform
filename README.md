@@ -106,3 +106,4 @@ snowpipe,dbtの処理を定期的に行う
 #### Todo
 - [監査ログ](https://airflow.apache.org/docs/apache-airflow/stable/security/audit_logs.html)
 - [モニタリング](https://zenn.dev/dataheroes/articles/2021-12-07-snowpipe-monitoring)
+- [適切な分配](https://zenn.dev/yujmatsu/articles/20251023_sf_performance)
