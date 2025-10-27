@@ -13,18 +13,11 @@ terraform {
 
 dependencies {
   paths = ["${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.account_roles}",
-      "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.user}",
+      "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.rsa_user}",
       ]
 }
+# TOOD:↑user統合後削除
 
 inputs = {
-  grants = flatten([
-    for g in local.ns_vars.grants:
-    [
-      for u in g.user_names : {
-        role_name = g.role_name
-        user_name = u
-      }
-    ]
-  ])
+  grants = local.ns_vars.grants_user_to_account
 }

@@ -1,0 +1,14 @@
+SNOWFLAKE_USER=<SNOWFLAKE_USER>
+PRIVATE_KEY_FILE=</opt/airflow/keys/rsa_key.p8>
+SNOWFLAKE_ACCOUNT=<SNOWFLAKE_ACCOUNT>
+SNOWFLAKE_REGION=<SNOWFLAKE_REGION>
+SNOWFLAKE_ROLE=<SNOWFLAKE_ROLE>
+SNOWFLAKE_WAREHOUSE=<SNOWFLAKE_WAREHOUSE>
+SNOWFLAKE_DATABASE=<SNOWFLAKE_DATABASE>
+SNOWFLAKE_SCHEMA=<SNOWFLAKE_SCHEMA>
+
+# Airflow が認識できる Snowflake 接続形式に変換
+AIRFLOW_CONN_SNOWFLAKE_DEFAULT_CONN={"conn_type":"snowflake","login":"${SNOWFLAKE_USER}","password":"","schema":"${SNOWFLAKE_SCHEMA}","extra":{"account":"${SNOWFLAKE_ACCOUNT}", "region":"${SNOWFLAKE_REGION}", "warehouse":"${SNOWFLAKE_WAREHOUSE}","database":"${SNOWFLAKE_DATABASE}","role":"${SNOWFLAKE_ROLE}","private_key_file":"${PRIVATE_KEY_FILE}","private_key_passphrase":""}}
+
+# 追加の Python パッケージをインストールするための環境変数.本番環境ではあらかじめこれをインストールしたコンテナを作成するべき。
+_PIP_ADDITIONAL_REQUIREMENTS=apache-airflow-providers-snowflake
