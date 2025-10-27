@@ -55,6 +55,8 @@ S3からの取り込み方法としてpipeの自動実行があるが、コス�
 pipe作成を行うhclのdependenciesにIAMの作成を設定しているが、terraformでの作成完了と実際に作成が完了するまでにラグがあるっぽい？要確認。
 
 - 完全修飾いるところの入力を分けてる(database_nameとschema_name入力させてる)けど場所によってはまとめたほうがよさそう。grants_ownershipは今回pipeしかやってないからdb.schema.~でいいけどdb.~の場合とかありそうだしとりあえず分けないでおく。ほかのところもちゃんと検討すべきだった。
+- warehouse, pipeの使用権限の付与方法が分からない。現在snowsightから手動。
+
 </details>
 
 #### Done

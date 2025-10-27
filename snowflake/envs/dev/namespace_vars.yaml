@@ -1,9 +1,10 @@
 IAM:
   role_name: "S3ToStorage_integration"
 # TODO:大域変数みたいな使い方したくないが、DRY優先とするならrootにおく？ファイル名namespace_vars_dev.yamlとかにしてやればよさそう
-
+# TODO:完全修飾をこのyaml上でやってるやつとtfでやってるやつがある。混乱を招きそうなので統一したい。
+# tfでやるとsnowflake側で実行エラー(terraformで特定できない)になる可能性ある模様。可能ならここで完全修飾必要ならやっとく。
 warehouses:
-  - name: "TEST_WAREHOUSES"
+  - name: "TEST_WAREHOUSE"
     warehouse_size: "XSMALL"
     auto_suspend: 60
     auto_resume: true
@@ -38,6 +39,15 @@ pipes:
     target_table: "TEST_TABLE"
     sql_file_name: "copy_statement.sql"
     target_format_name: "TEST_FORMAT"
+  - name: "TEST_PIPE2"
+    database: "TEST_DB"
+    schema: "TEST_SCHEMA"
+    comment: "snowsightでデバッグする用"
+    auto_ingest: false
+    stage_name: "TEST_STAGE"
+    target_table: "TEST_TABLE"
+    sql_file_name: "copy_statement.sql"
+    target_format_name: "TEST_FORMAT"
 
 databases:
   - name: "TEST_DB"
@@ -63,15 +73,46 @@ users:
 
 rsa_user:
   - name: "AIRFLOW"
-    login_name:  "Aiflow"
-    rsa_public_key: "rsa_key.pub"
-    default_role: "AIRFLOW"
-    default_warehouse: "TEST_WAREHOUSES"
+    login_name:  "AIRFLOW"
+    rsa_public_key: "/keys/rsa_key.pub" # rootからの相対パス
+    default_role: "AIRFLOW_ROLE"
+    default_warehouse: "TEST_WAREHOUSE"
     default_namespace: "TEST_DB.TEST_SCHEMA"
-# rsa_public_keyはrootにある想定。場所帰るなら相対パスにすれば行けると思う。
 # https://docs.snowflake.com/ja/user-guide/key-pair-auth
 
-database_grants:
+
+# AIRFLOWに必要な権限情報参考：https://docs.snowflake.com/ja/user-guide/data-load-snowpipe-intro#pausing-or-resuming-pipes
+# 上記に加えてwarehouseのUSAGE,FILE FORMATSのUSAGEが必要。
+account_grants_privileges:
+  - account_role_name: "AIRFLOW_ROLE"
+    privileges:
+    - "USAGE"
+    object_type: "WAREHOUSE"
+    object_name: "TEST_WAREHOUSE"
+
+
+
+grants_user_to_account:
+  - role_name: "AIRFLOW_ROLE"
+    user_name: "AIRFLOW"
+
+# データベースの権限付与
+# TODO:適切な粒度の検討。とりあえずは階層が深くなりすぎないように分割する。
+database_grants_on_database:
+  - database_role_name: "AIRFLOW_EXECUTE_PIPE"
+    on_database: "TEST_DB"
+    privileges:
+      - USAGE
+
+database_grants_on_schema:
+  - database_role_name: "AIRFLOW_EXECUTE_PIPE"
+    on_database: "TEST_DB" # roleもschemaも完全修飾名のため設定。
+    on_schema: "TEST_SCHEMA" # TODO:ここでリストにした方がいいか?
+    privileges: 
+      - USAGE
+
+# スキーマオブジェクトの権限付与
+database_grants_in_schema:
   - database_role_name: "DB_READ_ROLE"
     database_name: "TEST_DB"
     comment: "test"
@@ -81,19 +122,24 @@ database_grants:
         - SELECT
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
     database_name: "TEST_DB"
-    comment: "Airflow_execute_pipe"
+    comment: ""
     in_schema: "TEST_SCHEMA"
     object_privileges: 
       TABLES:
         - SELECT
         - INSERT
       STAGES:
-        - USAGE # 外部ステージ(S3)のため
+        - USAGE # 外部ステージ(S3)のため。
+      FILE FORMATS:
+        - USAGE  
+      PIPES:
+        - OPERATE # TODO:これで権限付与できていない模様。
 
+# TODO:warehouseのUSAGE
 grants_ownership:
   - object_type: "PIPE"
     object_name: "TEST_DB.TEST_SCHEMA.TEST_PIPE"
-    account_role_name: "AIRFLOW"
+    account_role_name: "AIRFLOW_ROLE"
 
 account_roles:
   - name: "ANALYST_ROLE"
@@ -102,7 +148,7 @@ account_roles:
       - database: "TEST_DB"
         names:
         - "DB_READ_ROLE"
-  - name: "AIRFLOW"
+  - name: "AIRFLOW_ROLE"
     comment: "Airflow only"
     grants_database_roles:
       - database: "TEST_DB"

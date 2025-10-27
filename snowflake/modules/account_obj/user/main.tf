@@ -4,3 +4,4 @@ resource "snowflake_user" "users" {
   name = each.value.name
 }
 # https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/user
+# TODO:default使えばrsa_userと統合できるはず？

@@ -18,7 +18,7 @@ provider "snowflake" {
     "snowflake_storage_integration_resource",
     "snowflake_file_format_resource",
     "snowflake_stage_resource",
-    "snowflake_pipe_resource"
+    "snowflake_pipe_resource",
   ]
  }
 
@@ -33,7 +33,7 @@ terraform {
   required_providers {
     snowflake = {
       source = "snowflakedb/snowflake"
-      version = "2.8.0"
+      version = "2.9.0"
     }
   }
 }

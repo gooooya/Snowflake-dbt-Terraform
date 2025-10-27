@@ -17,7 +17,7 @@ dependencies {
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.warehouses}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.account_roles}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.database_roles}",
-    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.database_grants}",
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.database_grants_in_schema}",
   ]
 }
 

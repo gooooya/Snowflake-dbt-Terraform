@@ -18,5 +18,5 @@ dependencies {
 }
 
 inputs = {
-  roles = local.ns_vars.database_grants
+  roles = local.ns_vars.database_grants_in_schema
 }

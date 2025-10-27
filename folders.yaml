@@ -3,6 +3,7 @@ module:
   s3_bucket: AWS/modules/s3_bucket
   S3_storage_integration: snowflake/modules/account_obj/S3_storage_integration
   account_grants: snowflake/modules/account_obj/account_grants
+  account_grants_privileges: snowflake/modules/account_obj/account_grants_privileges
   account_role: snowflake/modules/account_obj/account_role
   db: snowflake/modules/account_obj/db
   grants_ownership: snowflake/modules/account_obj/grants_ownership
@@ -10,6 +11,9 @@ module:
   user: snowflake/modules/account_obj/user
   warehouses: snowflake/modules/account_obj/warehouses
   database_grants: snowflake/modules/database_obj/database_grants
+  database_grants_in_schema: snowflake/modules/database_obj/database_grants_in_schema
+  database_grants_on_database: snowflake/modules/database_obj/database_grants_on_database
+  database_grants_on_schema: snowflake/modules/database_obj/database_grants_on_schema
   database_roles: snowflake/modules/database_obj/database_roles
   schema: snowflake/modules/database_obj/schema
   file_formats: snowflake/modules/schema_obj/pipe_obj/file_formats
@@ -22,6 +26,8 @@ terragrunt:
   dev:
     snowflake_role_dev: AWS/envs/dev/iam_role/snowflake_role_dev
     snowbucket: AWS/envs/dev/s3/snowbucket
+    account_grants: snowflake/envs/dev/account_obj/account_grants
+    account_grants_privileges: snowflake/envs/dev/account_obj/account_grants_privileges
     account_roles: snowflake/envs/dev/account_obj/account_roles
     db: snowflake/envs/dev/account_obj/db
     grants_ownership: snowflake/envs/dev/account_obj/grants_ownership
@@ -30,6 +36,9 @@ terragrunt:
     user: snowflake/envs/dev/account_obj/user
     warehouses: snowflake/envs/dev/account_obj/warehouses
     database_grants: snowflake/envs/dev/database_obj/database_grants
+    database_grants_in_schema: snowflake/envs/dev/database_obj/database_grants_in_schema
+    database_grants_on_database: snowflake/envs/dev/database_obj/database_grants_on_database
+    database_grants_on_schema: snowflake/envs/dev/database_obj/database_grants_on_schema
     database_roles: snowflake/envs/dev/database_obj/database_roles
     schema: snowflake/envs/dev/database_obj/schema
     test_format: snowflake/envs/dev/schema_obj/test_db/test_schema/pipe_obj/file_formats/test_format

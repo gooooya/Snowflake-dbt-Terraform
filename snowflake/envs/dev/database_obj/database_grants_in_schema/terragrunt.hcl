@@ -8,7 +8,7 @@ locals {
 }
 
 terraform {
-  source = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.database_grants}"
+  source = "${local.parent.root_folder}/${local.parent.relative_path_from_route.module.database_grants_in_schema}"
 }
 
 dependencies {
@@ -22,14 +22,15 @@ dependencies {
 }
 
 inputs = {
-  relation = flatten([
-    for ar in local.ns_vars.account_roles : [
-      for grant in ar.grants_database_roles : [
-        for db_role in grant.names : {
-          database_role_name = "${grant.database}.${db_role}"
-          parent_role_name  = ar.name
-        }
-      ]
+  grants = flatten([
+    for g in local.ns_vars.database_grants_in_schema : [
+      for obj_type, priv_list in g.object_privileges : {
+        database_role_name = "${g.database_name}.${g.database_role_name}"
+        database_name = g.database_name
+        in_schema = "${g.database_name}.${g.in_schema}"
+        object_type_plural = obj_type
+        privileges = priv_list
+      }
     ]
   ])
 }
