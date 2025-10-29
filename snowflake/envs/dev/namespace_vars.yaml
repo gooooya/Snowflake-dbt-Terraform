@@ -3,13 +3,88 @@ IAM:
 # TODO:大域変数みたいな使い方したくないが、DRY優先とするならrootにおく？ファイル名namespace_vars_dev.yamlとかにしてやればよさそう
 # TODO:完全修飾をこのyaml上でやってるやつとtfでやってるやつがある。混乱を招きそうなので統一したい。
 # tfでやるとsnowflake側で実行エラー(terraformで特定できない)になる可能性ある模様。可能ならここで完全修飾必要ならやっとく。
+# TODO:内容の分割と配置場所の検討。ごちゃごちゃしてる。
+# TODO:これリソース名とか小文字がよかった。SQL内で予約語と区別できない。
 warehouses:
   - name: "TEST_WAREHOUSE"
     warehouse_size: "XSMALL"
     auto_suspend: 60
     auto_resume: true
     initially_suspended: true
+  - name: "transforming"
+    warehouse_size: "XSMALL"
+    auto_suspend: 60
+    auto_resume: true
+    initially_suspended: true
 
+databases:
+  - name: "TEST_DB"
+    schemas:
+      - "TEST_SCHEMA"
+      - "TEST_SCHEMA2"
+  - name: "raw"
+    schemas:
+      - "jaffle_shop"
+      - "stripe"
+  - name: "analytics"
+    schemas:
+      - "tmp" # スキーマ無し作成ができない。できないけどスキーマ無いdatabase作るか？
+
+tables:
+  - name: "TEST_TABLE"
+    database: "TEST_DB"
+    schema: "TEST_SCHEMA"
+    column: 
+      - name: "A"
+        type: "string"
+      - name: "B"
+        type: "string"
+  - name: "customers"
+    database: "raw"
+    schema: "jaffle_shop"
+    column: 
+      - name: "id"
+        type: "integer"
+      - name: "first_name"
+        type: "varchar"
+      - name: "last_name"
+        type: "varchar"
+  - name: "orders"
+    database: "raw"
+    schema: "jaffle_shop"
+    column: 
+      - name: "id"
+        type: "integer"
+      - name: "user_id"
+        type: "integer"
+      - name: "order_date"
+        type: "date"
+      - name: "status"
+        type: "varchar"
+      - name: "_etl_loaded_at"
+        type: "TIMESTAMP_TZ(9)"
+        default: "CURRENT_TIMESTAMP()"
+  - name: "payment"
+    database: "raw"
+    schema: "stripe"
+    column: 
+      - name: "id"
+        type: "integer"
+      - name: "orderid"
+        type: "integer"
+      - name: "paymentmethod"
+        type: "varchar"
+      - name: "status"
+        type: "varchar"
+      - name: "amount"
+        type: "integer"
+      - name: "created"
+        type: "date"
+      - name: "_batched_at"
+        type: "TIMESTAMP_TZ(9)"
+        default: "CURRENT_TIMESTAMP()"
+
+# TODO:複数のstorage_integration実装。現在単一のS3を対象にしかできない。
 storage_integration:
   name: "TEST_STORAGE_INTEGRATION"
   type: "EXTERNAL_STAGE"
@@ -28,48 +103,118 @@ file_formats:
     database: "TEST_DB"
     schema: "TEST_SCHEMA"
     format_type: "CSV"
+  - name: "jaffle_shop_customers_format"
+    database: "raw"
+    schema: "jaffle_shop"
+    format_type: "CSV"
+    skip_header: 1
+    field_delimiter: ","
+  - name: "jaffle_shop_orders_format"
+    database: "raw"
+    schema: "jaffle_shop"
+    format_type: "CSV"
+    skip_header: 1
+    field_delimiter: ","
+  - name: "stripe_payments_format"
+    database: "raw"
+    schema: "stripe"
+    format_type: "CSV"
+    skip_header: 1
+    field_delimiter: ","
 
 pipes:
   - name: "TEST_PIPE"
-    database: "TEST_DB"
-    schema: "TEST_SCHEMA"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    to_database: "TEST_DB"
+    to_schema: "TEST_SCHEMA"
+    target_table: "TEST_TABLE"
     comment: "こっち使うほうがいい？→https://registry.terraform.io/modules/Snowflake-Labs/snowpipe-aws/snowflake/latest#required-parameters"
     auto_ingest: false
-    stage_name: "TEST_STAGE"
-    target_table: "TEST_TABLE"
     sql_file_name: "copy_statement.sql"
     target_format_name: "TEST_FORMAT"
   - name: "TEST_PIPE2"
-    database: "TEST_DB"
-    schema: "TEST_SCHEMA"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    to_database: "TEST_DB"
+    to_schema: "TEST_SCHEMA"
+    target_table: "TEST_TABLE"
     comment: "snowsightでデバッグする用"
     auto_ingest: false
-    stage_name: "TEST_STAGE"
-    target_table: "TEST_TABLE"
     sql_file_name: "copy_statement.sql"
     target_format_name: "TEST_FORMAT"
+  - name: "dbt_jaffle_shop_customers_pipe"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    stage_sub_dir: jaffle_shop_customers
+    to_database: "raw"
+    to_schema: "jaffle_shop"
+    target_table: "customers"
+    comment: "jaffle_shop_customers"
+    auto_ingest: false
+    sql_file_name: "copy_statement.sql"
+    target_format_name: "jaffle_shop_customers_format"
+  - name: "dbt_jaffle_shop_customers_pipe2"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    stage_sub_dir: jaffle_shop_customers
+    to_database: "raw"
+    to_schema: "jaffle_shop"
+    target_table: "customers"
+    comment: "snowsightでデバッグする用"
+    auto_ingest: false
+    sql_file_name: "copy_statement.sql"
+    target_format_name: "jaffle_shop_customers_format"
+  - name: "dbt_jaffle_shop_orders_pipe"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    stage_sub_dir: jaffle_shop_orders
+    to_database: "raw"
+    to_schema: "jaffle_shop"
+    target_table: "orders"
+    comment: "jaffle_shop_orders"
+    auto_ingest: false
+    sql_file_name: "copy_statement.sql"
+    target_format_name: "jaffle_shop_orders_format"
+  - name: "dbt_stripe_payments_pipe"
+    from_database: "TEST_DB"
+    from_schema: "TEST_SCHEMA"
+    stage_name: "TEST_STAGE"
+    stage_sub_dir: "stripe_payments"
+    to_database: "raw"
+    to_schema: "stripe"
+    target_table: "payment"
+    comment: "stripe_payments"
+    auto_ingest: false
+    sql_file_name: "copy_statement.sql"
+    target_format_name: "stripe_payments_format"
 
-databases:
-  - name: "TEST_DB"
-    schemas:
-      - "TEST_SCHEMA"
-      - "TEST_SCHEMA2"
-
-tables:
-  - name: "TEST_TABLE"
-    database: "TEST_DB"
-    schema: "TEST_SCHEMA"
-    column: 
-      - name: "A"
-        type: "string"
-      - name: "B"
-        type: "string"
+grants_ownership:
+  - object_type: "PIPE"
+    object_name: "TEST_DB.TEST_SCHEMA.TEST_PIPE"
+    account_role_name: "AIRFLOW_ROLE"
+    outbound_privileges: "REVOKE"
+  - object_type: "PIPE"
+    object_name: "raw.jaffle_shop.dbt_jaffle_shop_customers_pipe"
+    account_role_name: "AIRFLOW_ROLE"
+  - object_type: "PIPE"
+    object_name: "raw.jaffle_shop.dbt_jaffle_shop_orders_pipe"
+    account_role_name: "AIRFLOW_ROLE"
+  - object_type: "PIPE"
+    object_name: "raw.stripe.dbt_stripe_payments_pipe"
+    account_role_name: "AIRFLOW_ROLE"
 
 # TODO:ユーザ、ロール系切り離してもいいかも
 users:
   - name: "ANALYST1"
   - name: "DEV1"
   - name: "DEV2"
+  - name: "dbt_user"
 
 rsa_user:
   - name: "AIRFLOW"
@@ -80,7 +225,6 @@ rsa_user:
     default_namespace: "TEST_DB.TEST_SCHEMA"
 # https://docs.snowflake.com/ja/user-guide/key-pair-auth
 
-
 # AIRFLOWに必要な権限情報参考：https://docs.snowflake.com/ja/user-guide/data-load-snowpipe-intro#pausing-or-resuming-pipes
 # 上記に加えてwarehouseのUSAGE,FILE FORMATSのUSAGEが必要。
 account_grants_privileges:
@@ -89,40 +233,65 @@ account_grants_privileges:
     - "USAGE"
     object_type: "WAREHOUSE"
     object_name: "TEST_WAREHOUSE"
-
-
+  - account_role_name: "AIRFLOW_ROLE"
+    privileges:
+    - "USAGE"
+    object_type: "INTEGRATION"
+    object_name: "TEST_STORAGE_INTEGRATION" 
+  - account_role_name: "dbt_role"
+    privileges:
+    - "USAGE"
+    object_type: "WAREHOUSE"
+    object_name: "transforming"
 
 grants_user_to_account:
   - role_name: "AIRFLOW_ROLE"
     user_name: "AIRFLOW"
+  - role_name: "dbt_role"
+    user_name: "dbt_user"
 
 # データベースの権限付与
 # TODO:適切な粒度の検討。とりあえずは階層が深くなりすぎないように分割する。
+
 database_grants_on_database:
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
     on_database: "TEST_DB"
+    privileges:
+      - USAGE
+  - database_role_name: "dbt_database_role"
+    on_database: "raw"
     privileges:
       - USAGE
 
 database_grants_on_schema:
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
     on_database: "TEST_DB" # roleもschemaも完全修飾名のため設定。
-    on_schema: "TEST_SCHEMA" # TODO:ここでリストにした方がいいか?
+    on_schema: "TEST_SCHEMA" # TODO:ここでリストにした方がいいか?↓を見るにした方がよさそう（優先度低）
+    privileges: 
+      - USAGE
+  - database_role_name: "dbt_database_role"
+    on_database: "raw"
+    on_schema: "jaffle_shop"
+    privileges: 
+      - USAGE
+  - database_role_name: "dbt_database_role"
+    on_database: "raw"
+    on_schema: "stripe"
     privileges: 
       - USAGE
 
 # スキーマオブジェクトの権限付与
+# TODO:空のrole作成→権限付与とするべき？対応するリソースないと困る。
+# TODO:DBroleこれをもとに作成するのやめるべきか？
 database_grants_in_schema:
   - database_role_name: "DB_READ_ROLE"
     database_name: "TEST_DB"
-    comment: "test"
     in_schema: "TEST_SCHEMA"
     object_privileges: 
       TABLES:
         - SELECT
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
     database_name: "TEST_DB"
-    comment: ""
     in_schema: "TEST_SCHEMA"
     object_privileges: 
       TABLES:
@@ -133,13 +302,33 @@ database_grants_in_schema:
       FILE FORMATS:
         - USAGE  
       PIPES:
-        - OPERATE # TODO:これで権限付与できていない模様。
-
-# TODO:warehouseのUSAGE
-grants_ownership:
-  - object_type: "PIPE"
-    object_name: "TEST_DB.TEST_SCHEMA.TEST_PIPE"
-    account_role_name: "AIRFLOW_ROLE"
+        - OPERATE
+  - database_role_name: "dbt_database_role"
+    database_name: "raw"
+    in_schema: "jaffle_shop"
+    object_privileges: 
+      TABLES:
+        - SELECT
+        - INSERT
+      STAGES:
+        - USAGE # 外部ステージ(S3)のため。
+      FILE FORMATS:
+        - USAGE  
+      PIPES:
+        - OPERATE
+  - database_role_name: "dbt_database_role"
+    database_name: "raw"
+    in_schema: "stripe"
+    object_privileges: 
+      TABLES:
+        - SELECT
+        - INSERT
+      STAGES:
+        - USAGE # 外部ステージ(S3)のため。
+      FILE FORMATS:
+        - USAGE  
+      PIPES:
+        - OPERATE
 
 account_roles:
   - name: "ANALYST_ROLE"
@@ -154,3 +343,12 @@ account_roles:
       - database: "TEST_DB"
         names:
         - "AIRFLOW_EXECUTE_PIPE"
+      - database: "raw"
+        names:
+        - "dbt_database_role"
+  - name: "dbt_role"
+    comment: "DBT用. 権限付与はsnowsight上で行う。https://docs.snowflake.com/ja/user-guide/data-engineering/dbt-projects-on-snowflake-access-control の権限付与できるリソースが現状なさそう。"
+    grants_database_roles:
+      - database: "raw"
+        names:
+        - "dbt_database_role"

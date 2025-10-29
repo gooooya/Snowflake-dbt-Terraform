@@ -26,37 +26,51 @@ S3からの取り込み方法としてpipeの自動実行があるが、コス�
 
 #### Todo(課題・検討事項)
 <details>
+
 - namespace_varの適切な分割粒度
 
 - ロール、グラントの置き場所。snowflake_account_roleとsnowflake_database_roleで分けるのはいいとして、snowflake_database_roleはどこに置くか？
 
-- 権限付与の仕方。database_role→account_role→userとしているが、[こちら](https://docs.snowflake.com/en/user-guide/security-access-control-overview)を見るに直接database_role→userとできそうだが、[ドキュメント](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/grant_database_role)でそれらしいresourceを見つけられていない。snowflakeにはあるがterraformの機能としては存在していない？→[これ](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/grant_privileges_to_account_role)でいけそう。
-- yamlに情報持たせすぎ？
+- [ ]権限付与の仕方。database_role→account_role→userとしているが、[こちら](https://docs.snowflake.com/en/user-guide/security-access-control-overview)を見るに直接database_role→userとできそうだが、[ドキュメント](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/grant_database_role)でそれらしいresourceを見つけられていない。snowflakeにはあるがterraformの機能としては存在していない？→[これ](https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/grant_privileges_to_account_role)でいけそう。
+- [ ]yamlに情報持たせすぎ？
 
-- yaml内の構成。インデント深くなりすぎないように分割しているが、もうちょいまとめてもいいかも。roleとか。
+- [ ]yaml内の構成。インデント深くなりすぎないように分割しているが、もうちょいまとめてもいいかも。roleとか。
 
-- yamlの構成がまずく、同じものを指すものが複数個所にあるのが嫌。file_formatのformat_typeとpipeのtarget_formatとか。
+- [ ]yamlの構成がまずく、同じものを指すものが複数個所にあるのが嫌。file_formatのformat_typeとpipeのtarget_formatとか。インデントの深さとトレードオフのため要検討。
 
-- s3と紐づけられないため、storage_integrations単体しか作れないようになってる。rootにおいてバケット名との関連をyamlで示すようにすれば紐づけできそう。
+- [ ]s3と紐づけられないため、storage_integrations単体しか作れないようになってる。rootにおいてバケット名との関連をyamlで示すようにすれば紐づけできそう。
 
-- 大文字小文字の区別がある部分はupperつけるとかしたほうがいいかも
+- [ ]大文字小文字の区別がある部分はupperつけるとかしたほうがいいかも
 
-- 一回目の実行でpipeの作成エラーとなるが、続けてもう一度実行すると成功する。
+- [ ]一回目の実行でpipeの作成エラーとなるが、続けてもう一度実行すると成功する。
 ~~~
   ╷
   │ Error: 003167 (42601): Error assuming AWS_ROLE:
-  │ User: arn:aws:iam::241636745402:user/ryp81000-s is not authorized to perform: sts:AssumeRole on resource: arn:aws:iam::439309983733:role/S3ToStorage_integration
-  │
-  │   with snowflake_pipe.pipe["TEST_PIPE"],
-  │   on main.tf line 1, in resource "snowflake_pipe" "pipe":
-  │    1: resource "snowflake_pipe" "pipe" {
-  exit status 1
 ~~~
-pipe作成を行うhclのdependenciesにIAMの作成を設定しているが、terraformでの作成完了と実際に作成が完了するまでにラグがあるっぽい？要確認。
+pipe作成を行うhclのdependenciesにIAMの作成を設定しているが、terraformでの作成完了と実際に作成が完了するまでにラグがあるっぽい？要確認。たまに発生しないこともある。
 
-- 完全修飾いるところの入力を分けてる(database_nameとschema_name入力させてる)けど場所によってはまとめたほうがよさそう。grants_ownershipは今回pipeしかやってないからdb.schema.~でいいけどdb.~の場合とかありそうだしとりあえず分けないでおく。ほかのところもちゃんと検討すべきだった。
-- warehouse, pipeの使用権限の付与方法が分からない。現在snowsightから手動。
+- [ ]完全修飾いるところの入力を分けてる(database_nameとschema_name入力させてる)けど場所によってはまとめたほうがよさそう。grants_ownershipは今回pipeしかやってないからdb.schema.~でいいけどdb.~の場合とかありそうだしとりあえず分けないでおく。ほかのところもちゃんと検討すべきだった。
 
+- [ ][監査ログ](https://airflow.apache.org/docs/apache-airflow/stable/security/audit_logs.html)
+
+- [ ][モニタリング](https://zenn.dev/dataheroes/articles/2021-12-07-snowpipe-monitoring)
+
+- [ ][適切な分配](https://zenn.dev/yujmatsu/articles/20251023_sf_performance)
+
+- [ ]root.hclに全部の設定記載してrootにおいてもいいかも。そしたら[get_parent_terragrunt_dir](https://terragrunt.gruntwork.io/docs/reference/hcl/functions/#get_parent_terragrunt_dir)使える。プロバイダ毎に分割する必要はない？folders.yamlから相対パス取得するなら手間変わらなそうではあるが、なるべく標準のものを使うべき。
+
+- [ ]作成時はいいが、更新時について検討できていない。[この辺](https://zenn.dev/ishii1648/articles/a6a311f7cdd23c)考慮すること。
+
+- [ ]更新時にpipeでエラーになる。ownership移譲しているから権限がない模様。destroy→applyで対応できるが修正は必要。
+
+- [ ]predくんがS3にファイルアップロードできないって言ってるけどできてる。謎。要確認→自動でretryしてるっぽいログを見かけた。ほかのやつでも明示的にretryかけるか確認する。
+
+- [ ]database_grants_~系まとめたほうがいいか？見にくくなりそうな気もする。
+
+
+~~~
+Error: uploading S3 Object (stripe_payments/stripe_payments.csv) to Bucket (snowbucket-prod-73143758172): operation error S3: PutObject, https response error StatusCode: 404, 
+~~~
 </details>
 
 #### Done
@@ -91,6 +105,10 @@ USE SCHEMA TEST_SCHEMA;
 ~~~
 した後、WebUI上で実行できた。
 →完全修飾名での指定が必要。
+
+- 権限移譲したpipeがpauseになり、Airflowから実行できる(成功になる)がファイルを取り込めない。
+→ DAGでパイプを強制的に再開する。権限移譲時にstopになる(本来は明示的に止めるべき？)模様[参考](https://docs.snowflake.com/ja/user-guide/data-load-snowpipe-manage#transferring-pipe-ownership)
+
 </details>
 
 ### Airflow
@@ -103,6 +121,17 @@ snowpipe,dbtの処理を定期的に行う
 #### Done
 - [チュートリアル](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/index.html)
 
+
+### dbt
+
+#### 使用データ
+[こちら](https://docs.getdbt.com/guides/snowflake?step=3)で示される3ファイル。
+- s3://dbt-tutorial-public/jaffle_shop_customers.csv
+- s3://dbt-tutorial-public/jaffle_shop_orders.csv
+- s3://dbt-tutorial-public/stripe_payments.csv
+
+#### wip
+- [これ](https://docs.getdbt.com/guides/snowflake?step=1)
+
 #### Todo
-- [監査ログ](https://airflow.apache.org/docs/apache-airflow/stable/security/audit_logs.html)
-- [モニタリング](https://zenn.dev/dataheroes/articles/2021-12-07-snowpipe-monitoring)
+- GRANT CREATE DBT PROJECT ON SCHEMA my_database.my_schema TO ROLE my_role;にあたるリソースをterraformで設定する。現状これを行うリソースがなさそう？内部的にはUSAGEとかの組み合わせだったりするのか？

@@ -10,9 +10,15 @@ resource "snowflake_table" "this" {
     content {
       name = column.value.name
       type = column.value.type
+
+      dynamic "default" {
+        for_each = column.value.default != null ? [column.value.default] : []
+        content {
+          expression = default.value
+        }
+      }
     }
   }
 }
-
 
 # https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/table

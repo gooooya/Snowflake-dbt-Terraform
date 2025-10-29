@@ -20,12 +20,10 @@ module:
   snowpipe_manual: snowflake/modules/schema_obj/pipe_obj/snowpipe_manual
   stage: snowflake/modules/schema_obj/stage
   table: snowflake/modules/schema_obj/table
-  test: test
-  子: test/子
 terragrunt:
   dev:
     snowflake_role_dev: AWS/envs/dev/iam_role/snowflake_role_dev
-    snowbucket: AWS/envs/dev/s3/snowbucket
+    s3_bucket: AWS/envs/dev/s3_bucket
     account_grants: snowflake/envs/dev/account_obj/account_grants
     account_grants_privileges: snowflake/envs/dev/account_obj/account_grants_privileges
     account_roles: snowflake/envs/dev/account_obj/account_roles
@@ -41,12 +39,9 @@ terragrunt:
     database_grants_on_schema: snowflake/envs/dev/database_obj/database_grants_on_schema
     database_roles: snowflake/envs/dev/database_obj/database_roles
     schema: snowflake/envs/dev/database_obj/schema
-    test_format: snowflake/envs/dev/schema_obj/test_db/test_schema/pipe_obj/file_formats/test_format
-    test_pipe: snowflake/envs/dev/schema_obj/test_db/test_schema/pipe_obj/snowpipe/test_pipe
-    test_stage: snowflake/envs/dev/schema_obj/test_db/test_schema/stage/test_stage
-    test_table: snowflake/envs/dev/schema_obj/test_db/test_schema/table/test_table
+    file_formats: snowflake/envs/dev/schema_obj/pipe_obj/file_formats
+    snowpipe: snowflake/envs/dev/schema_obj/pipe_obj/snowpipe
+    stage: snowflake/envs/dev/schema_obj/stage
+    table: snowflake/envs/dev/schema_obj/table
   prod:
-    s3: AWS/envs/prod/s3
-  others:
-    test: test
-    子: test/子
+    s3_bucket: AWS/envs/prod/s3_bucket
