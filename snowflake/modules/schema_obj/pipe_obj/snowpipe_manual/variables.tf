@@ -1,12 +1,15 @@
 variable "relation" {
   type = list(object({
     name = string
-    database = string
-    schema = string
+    from_database = string
+    from_schema = string
+    stage_name = string
+    stage_sub_dir = optional(string, "")
+    to_database = string
+    to_schema = string
+    target_table = string
     comment = string
     auto_ingest = bool
-    stage_name = string
-    target_table = string
     sql_file_name = string
     target_format_name = string
   }))

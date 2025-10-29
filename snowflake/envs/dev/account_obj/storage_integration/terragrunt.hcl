@@ -12,7 +12,7 @@ terraform {
 }
 
 dependency "s3" {
-  config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowbucket}"
+  config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.s3_bucket}"
 
   mock_outputs = {
     original_s3_url = "S3://XXXXX"

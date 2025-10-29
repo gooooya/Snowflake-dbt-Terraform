@@ -14,10 +14,11 @@ terraform {
 dependencies {
   paths = [
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.database_roles}",
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.schema}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.account_roles}",
     "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.user}",
-    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.test_stage}",
-    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.test_pipe}",
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.stage}",
+    "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowpipe}",
    ]
 }
 

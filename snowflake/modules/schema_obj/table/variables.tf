@@ -6,6 +6,7 @@ variable "relation" {
     column   = list(object({
       name = string
       type = string
+      default = optional(any)
     }))
   }))
 }

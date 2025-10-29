@@ -14,6 +14,7 @@ terraform {
 dependencies {
   paths = ["${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.account_roles}",
       "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.warehouses}",
+      "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.storage_integration}",
       ]
 }
 # TODO:object_typeが可変のため、dependencies固定できない。対象のobject_type列挙しなきゃダメな作りになってる気がする。

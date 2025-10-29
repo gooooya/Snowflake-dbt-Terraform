@@ -3,5 +3,6 @@ variable "grants_ownership" {
     object_type = string
     object_name = string
     account_role_name = string
+    outbound_privileges = optional(string, "COPY")
   }))
 }

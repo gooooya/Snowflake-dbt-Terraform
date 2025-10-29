@@ -1,0 +1,13 @@
+IAM:
+  role_name: "S3ToStorage_integration"
+
+S3:
+  bucket_name: "snowbucket-prod-73143758172"
+  environment: "prod"
+  objects:
+    - key: "jaffle_shop_customers/jaffle_shop_customers.csv"
+      source: "/dbt/sample_data/jaffle_shop_customers.csv"
+    - key: "jaffle_shop_orders/jaffle_shop_orders.csv"
+      source: "/dbt/sample_data/jaffle_shop_orders.csv"
+    - key: "stripe_payments/stripe_payments.csv"
+      source: "/dbt/sample_data/stripe_payments.csv"

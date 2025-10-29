@@ -9,7 +9,7 @@ resource "snowflake_storage_integration" "this" {
   type = var.storage_integration.type
   enabled = var.storage_integration.enabled
   storage_allowed_locations = var.storage_integration.storage_allowed_locations
-  
+
   storage_provider = var.storage_integration.storage_provider
   storage_aws_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.storage_integration.role_name}"
 }

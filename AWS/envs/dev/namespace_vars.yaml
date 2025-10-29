@@ -1,2 +1,12 @@
 IAM:
   role_name: "S3ToStorage_integration"
+
+S3:
+  bucket_name: "snowbucket-dev-4169857843"
+  environment: "Dev"
+  objects:
+    - key: "jaffle_shop_customers/"
+    - key: "jaffle_shop_orders/"
+    - key: "stripe_payments/"
+    # - key: "stripe_payments/stripe_payments.csv"
+    #   source: "/dbt/sample_data/stripe_payments.csv"

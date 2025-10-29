@@ -20,7 +20,7 @@ dependency "s3_integrations" {
 }
 
 dependency "s3" {
-  config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.snowbucket}"
+  config_path = "${local.parent.root_folder}/${local.parent.relative_path_from_route.terragrunt.dev.s3_bucket}"
   
   mock_outputs = {
     bucket_arn = "arn:aws:s3:::dummy-bucket"
@@ -33,6 +33,3 @@ inputs = {
   snowflake_external_id = dependency.s3_integrations.outputs.storage_aws_external_id
   bucket_arn = dependency.s3.outputs.bucket_arn
 }
-
-
-  
