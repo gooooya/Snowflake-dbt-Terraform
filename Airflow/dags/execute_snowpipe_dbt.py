@@ -11,42 +11,53 @@ from airflow.sdk import dag
     tags=["snowflake_pipe"],
 )
 def trigger_snowpipe_dbt_manual():
-    run_pipe_jaffle_shop_cus_wake = SnowflakeSqlApiOperator(
+    run_pipe_JAFFLE_SHOP_cus_wake = SnowflakeSqlApiOperator(
         task_id='run_pipe_cus_wake',
         snowflake_conn_id="snowflake_default_conn",
         warehouse="TEST_WAREHOUSE",
-        database="raw",
-        schema="jaffle_shop",
+        # database="RAW", # TODO:下で完全修飾するならいらないかも
+        # schema="JAFFLE_SHOP", # TODO:下で完全修飾するならいらないかも
         sql= '''
-        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"raw\".\"jaffle_shop\".\"dbt_jaffle_shop_customers_pipe\"\');
-        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"raw\".\"jaffle_shop\".\"dbt_jaffle_shop_orders_pipe\"\');
-        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"raw\".\"stripe\".\"dbt_stripe_payments_pipe\"\');
+        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"RAW\".\"JAFFLE_SHOP\".\"DBT_JAFFLE_SHOP_CUSTOMERS_PIPE\"\');
+        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"RAW\".\"JAFFLE_SHOP\".\"DBT_JAFFLE_SHOP_ORDERS_PIPE\"\');
+        SELECT SYSTEM$PIPE_FORCE_RESUME(\'\"RAW\".\"STRIPE\".\"DBT_STRIPE_PAYMENTS_PIPE\"\');
         '''
     )
-    run_pipe_jaffle_shop_cus = SnowflakeSqlApiOperator(
+    run_pipe_JAFFLE_SHOP_cus = SnowflakeSqlApiOperator(
         task_id='run_pipe_cus',
         snowflake_conn_id="snowflake_default_conn",
         warehouse="TEST_WAREHOUSE",
-        database="raw",
-        schema="jaffle_shop",
-        sql= 'ALTER PIPE "dbt_jaffle_shop_customers_pipe" REFRESH;'
+        database="RAW",
+        schema="JAFFLE_SHOP",
+        sql= 'ALTER PIPE "DBT_JAFFLE_SHOP_CUSTOMERS_PIPE" REFRESH;'
     )
-    run_pipe_jaffle_shop_order = SnowflakeSqlApiOperator(
+    run_pipe_JAFFLE_SHOP_order = SnowflakeSqlApiOperator(
         task_id='run_pipe_order',
         snowflake_conn_id="snowflake_default_conn",
         warehouse="TEST_WAREHOUSE",
-        database="raw",
-        schema="jaffle_shop",
-        sql= 'ALTER PIPE "dbt_jaffle_shop_orders_pipe" REFRESH;'
+        database="RAW",
+        schema="JAFFLE_SHOP",
+        sql= 'ALTER PIPE "DBT_JAFFLE_SHOP_ORDERS_PIPE" REFRESH;'
     )
-    run_pipe_stripe_payments = SnowflakeSqlApiOperator(
+    run_pipe_STRIPE_payments = SnowflakeSqlApiOperator(
         task_id='run_pipe_payment',
         snowflake_conn_id="snowflake_default_conn",
         warehouse="TEST_WAREHOUSE",
-        database="raw",
-        schema="stripe",
-        sql= 'ALTER PIPE "dbt_stripe_payments_pipe" REFRESH;'
+        database="RAW",
+        schema="STRIPE",
+        sql= 'ALTER PIPE "DBT_STRIPE_PAYMENTS_PIPE" REFRESH;'
     )
-    run_pipe_jaffle_shop_cus_wake >> [run_pipe_stripe_payments, run_pipe_jaffle_shop_order,run_pipe_jaffle_shop_cus]
-    # 本来は並列でよい。マシン性能を考慮して直列にする(という体で依存の書き方を確認)
+    run_pipe_sleep = SnowflakeSqlApiOperator(
+        task_id='run_pipe_cus_sleep',
+        snowflake_conn_id="snowflake_default_conn",
+        warehouse="TEST_WAREHOUSE",
+        database="RAW",
+        schema="JAFFLE_SHOP",
+        sql= '''
+        ALTER PIPE "RAW"."JAFFLE_SHOP"."DBT_JAFFLE_SHOP_CUSTOMERS_PIPE" SET PIPE_EXECUTION_PAUSED=true;
+        ALTER PIPE "RAW"."JAFFLE_SHOP"."DBT_JAFFLE_SHOP_ORDERS_PIPE" SET PIPE_EXECUTION_PAUSED=true;
+        ALTER PIPE "RAW"."STRIPE"."DBT_STRIPE_PAYMENTS_PIPE" SET PIPE_EXECUTION_PAUSED=true;
+        '''
+    )
+    run_pipe_JAFFLE_SHOP_cus_wake >> [run_pipe_STRIPE_payments, run_pipe_JAFFLE_SHOP_order,run_pipe_JAFFLE_SHOP_cus] >> run_pipe_sleep
 execute_et = trigger_snowpipe_dbt_manual()
