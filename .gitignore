@@ -1,9 +1,11 @@
 .*
 !.gitignore
 _*
+dbt/logs
 Airflow/config/
 Airflow/logs/
 Airflow/plugins/
-rsa_key.p8
-rsa_key.pub
+rsa_key*
 memo.txt
+dbt_internal_packages/
+dbt/target/

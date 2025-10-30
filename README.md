@@ -7,12 +7,11 @@
 #### 現在までの構成図
 ![](images/構成図.drawio.png)
 
-
 ### snowflake, S3
 #### 概要
 S3に格納されたデータをpipeをもってsnowflakeのテーブルに格納する。  
 S3からの取り込み方法としてpipeの自動実行があるが、コスト面と即時性は別に要らない点を考慮してAirflowで定期取り込みとする。  
-~~snowflake_notification_integrationとかの設定めんどくさそう。~~
+~~snowflake_notification_integrationとか通知の設定めんどくさそう。~~
 
 #### 環境変数
 - AWS_ACCESS_KEY_ID=XXXXX
@@ -62,8 +61,9 @@ pipe作成を行うhclのdependenciesにIAMの作成を設定しているが、t
 - [ ]作成時はいいが、更新時について検討できていない。[この辺](https://zenn.dev/ishii1648/articles/a6a311f7cdd23c)考慮すること。
 
 - [ ]更新時にpipeでエラーになる。ownership移譲しているから権限がない模様。destroy→applyで対応できるが修正は必要。
+→nameの変更以外を無視するようにした。これにより、追加/削除はできるが更新できないようになっている。どちらにせよ権限移譲しているものはこれでよい認識。
 
-- [ ]predくんがS3にファイルアップロードできないって言ってるけどできてる。謎。要確認→自動でretryしてるっぽいログを見かけた。ほかのやつでも明示的にretryかけるか確認する。
+- [ ]predくんがS3にファイルアップロードできないって言ってるけどできてる。謎。要確認→自動でretryしてるっぽいログを見かけた。ほかのやつでも明示的にretryかけられるか確認する。
 
 - [ ]database_grants_~系まとめたほうがいいか？見にくくなりそうな気もする。
 
@@ -108,6 +108,7 @@ USE SCHEMA TEST_SCHEMA;
 
 - 権限移譲したpipeがpauseになり、Airflowから実行できる(成功になる)がファイルを取り込めない。
 → DAGでパイプを強制的に再開する。権限移譲時にstopになる(本来は明示的に止めるべき？)模様[参考](https://docs.snowflake.com/ja/user-guide/data-load-snowpipe-manage#transferring-pipe-ownership)
+→stopしないとdestroyできないので注意。
 
 </details>
 
@@ -120,7 +121,6 @@ snowpipe,dbtの処理を定期的に行う
 
 #### Done
 - [チュートリアル](https://airflow.apache.org/docs/apache-airflow/stable/tutorial/index.html)
-
 
 ### dbt
 

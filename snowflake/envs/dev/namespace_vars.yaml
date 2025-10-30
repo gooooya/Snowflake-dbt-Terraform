@@ -11,7 +11,7 @@ warehouses:
     auto_suspend: 60
     auto_resume: true
     initially_suspended: true
-  - name: "transforming"
+  - name: "TRANSFORMING"
     warehouse_size: "XSMALL"
     auto_suspend: 60
     auto_resume: true
@@ -22,13 +22,13 @@ databases:
     schemas:
       - "TEST_SCHEMA"
       - "TEST_SCHEMA2"
-  - name: "raw"
+  - name: "RAW"
     schemas:
-      - "jaffle_shop"
-      - "stripe"
-  - name: "analytics"
+      - "JAFFLE_SHOP"
+      - "STRIPE"
+  - name: "ANALYTICS"
     schemas:
-      - "tmp" # スキーマ無し作成ができない。できないけどスキーマ無いdatabase作るか？
+      - "TMP" # スキーマ無し作成ができない。できないけどスキーマ無いdatabase作るか？
 
 tables:
   - name: "TEST_TABLE"
@@ -39,9 +39,9 @@ tables:
         type: "string"
       - name: "B"
         type: "string"
-  - name: "customers"
-    database: "raw"
-    schema: "jaffle_shop"
+  - name: "CUSTOMERS"
+    database: "RAW"
+    schema: "JAFFLE_SHOP"
     column: 
       - name: "id"
         type: "integer"
@@ -49,9 +49,9 @@ tables:
         type: "varchar"
       - name: "last_name"
         type: "varchar"
-  - name: "orders"
-    database: "raw"
-    schema: "jaffle_shop"
+  - name: "ORDERS"
+    database: "RAW"
+    schema: "JAFFLE_SHOP"
     column: 
       - name: "id"
         type: "integer"
@@ -64,15 +64,15 @@ tables:
       - name: "_etl_loaded_at"
         type: "TIMESTAMP_TZ(9)"
         default: "CURRENT_TIMESTAMP()"
-  - name: "payment"
-    database: "raw"
-    schema: "stripe"
+  - name: "PAYMENT"
+    database: "RAW"
+    schema: "STRIPE"
     column: 
       - name: "id"
         type: "integer"
       - name: "orderid"
         type: "integer"
-      - name: "paymentmethod"
+      - name: "PAYMENTmethod"
         type: "varchar"
       - name: "status"
         type: "varchar"
@@ -103,21 +103,21 @@ file_formats:
     database: "TEST_DB"
     schema: "TEST_SCHEMA"
     format_type: "CSV"
-  - name: "jaffle_shop_customers_format"
-    database: "raw"
-    schema: "jaffle_shop"
+  - name: "JAFFLE_SHOP_CUSTOMERS_FORMAT"
+    database: "RAW"
+    schema: "JAFFLE_SHOP"
     format_type: "CSV"
     skip_header: 1
     field_delimiter: ","
-  - name: "jaffle_shop_orders_format"
-    database: "raw"
-    schema: "jaffle_shop"
+  - name: "JAFFLE_SHOP_ORDERS_FORMAT"
+    database: "RAW"
+    schema: "JAFFLE_SHOP"
     format_type: "CSV"
     skip_header: 1
     field_delimiter: ","
-  - name: "stripe_payments_format"
-    database: "raw"
-    schema: "stripe"
+  - name: "STRIPE_PAYMENTS_FORMAT"
+    database: "RAW"
+    schema: "STRIPE"
     format_type: "CSV"
     skip_header: 1
     field_delimiter: ","
@@ -145,54 +145,54 @@ pipes:
     auto_ingest: false
     sql_file_name: "copy_statement.sql"
     target_format_name: "TEST_FORMAT"
-  - name: "dbt_jaffle_shop_customers_pipe"
+  - name: "DBT_JAFFLE_SHOP_CUSTOMERS_PIPE"
     from_database: "TEST_DB"
     from_schema: "TEST_SCHEMA"
     stage_name: "TEST_STAGE"
-    stage_sub_dir: jaffle_shop_customers
-    to_database: "raw"
-    to_schema: "jaffle_shop"
-    target_table: "customers"
-    comment: "jaffle_shop_customers"
+    stage_sub_dir: JAFFLE_SHOP_CUSTOMERS
+    to_database: "RAW"
+    to_schema: "JAFFLE_SHOP"
+    target_table: "CUSTOMERS"
+    comment: "JAFFLE_SHOP_CUSTOMERS"
     auto_ingest: false
     sql_file_name: "copy_statement.sql"
-    target_format_name: "jaffle_shop_customers_format"
-  - name: "dbt_jaffle_shop_customers_pipe2"
+    target_format_name: "JAFFLE_SHOP_CUSTOMERS_FORMAT"
+  - name: "DBT_JAFFLE_SHOP_CUSTOMERS_PIPE2"
     from_database: "TEST_DB"
     from_schema: "TEST_SCHEMA"
     stage_name: "TEST_STAGE"
-    stage_sub_dir: jaffle_shop_customers
-    to_database: "raw"
-    to_schema: "jaffle_shop"
-    target_table: "customers"
+    stage_sub_dir: JAFFLE_SHOP_CUSTOMERS
+    to_database: "RAW"
+    to_schema: "JAFFLE_SHOP"
+    target_table: "CUSTOMERS"
     comment: "snowsightでデバッグする用"
     auto_ingest: false
     sql_file_name: "copy_statement.sql"
-    target_format_name: "jaffle_shop_customers_format"
-  - name: "dbt_jaffle_shop_orders_pipe"
+    target_format_name: "JAFFLE_SHOP_CUSTOMERS_FORMAT"
+  - name: "DBT_JAFFLE_SHOP_ORDERS_PIPE"
     from_database: "TEST_DB"
     from_schema: "TEST_SCHEMA"
     stage_name: "TEST_STAGE"
-    stage_sub_dir: jaffle_shop_orders
-    to_database: "raw"
-    to_schema: "jaffle_shop"
-    target_table: "orders"
-    comment: "jaffle_shop_orders"
+    stage_sub_dir: JAFFLE_SHOP_ORDERS
+    to_database: "RAW"
+    to_schema: "JAFFLE_SHOP"
+    target_table: "ORDERS"
+    comment: "JAFFLE_SHOP_ORDERS"
     auto_ingest: false
     sql_file_name: "copy_statement.sql"
-    target_format_name: "jaffle_shop_orders_format"
-  - name: "dbt_stripe_payments_pipe"
+    target_format_name: "JAFFLE_SHOP_ORDERS_FORMAT"
+  - name: "DBT_STRIPE_PAYMENTS_PIPE"
     from_database: "TEST_DB"
     from_schema: "TEST_SCHEMA"
     stage_name: "TEST_STAGE"
-    stage_sub_dir: "stripe_payments"
-    to_database: "raw"
-    to_schema: "stripe"
-    target_table: "payment"
-    comment: "stripe_payments"
+    stage_sub_dir: "STRIPE_PAYMENTS"
+    to_database: "RAW"
+    to_schema: "STRIPE"
+    target_table: "PAYMENT"
+    comment: "STRIPE_PAYMENTS"
     auto_ingest: false
     sql_file_name: "copy_statement.sql"
-    target_format_name: "stripe_payments_format"
+    target_format_name: "STRIPE_PAYMENTS_FORMAT"
 
 grants_ownership:
   - object_type: "PIPE"
@@ -200,13 +200,13 @@ grants_ownership:
     account_role_name: "AIRFLOW_ROLE"
     outbound_privileges: "REVOKE"
   - object_type: "PIPE"
-    object_name: "raw.jaffle_shop.dbt_jaffle_shop_customers_pipe"
+    object_name: "RAW.JAFFLE_SHOP.DBT_JAFFLE_SHOP_CUSTOMERS_PIPE"
     account_role_name: "AIRFLOW_ROLE"
   - object_type: "PIPE"
-    object_name: "raw.jaffle_shop.dbt_jaffle_shop_orders_pipe"
+    object_name: "RAW.JAFFLE_SHOP.DBT_JAFFLE_SHOP_ORDERS_PIPE"
     account_role_name: "AIRFLOW_ROLE"
   - object_type: "PIPE"
-    object_name: "raw.stripe.dbt_stripe_payments_pipe"
+    object_name: "RAW.STRIPE.DBT_STRIPE_PAYMENTS_PIPE"
     account_role_name: "AIRFLOW_ROLE"
 
 # TODO:ユーザ、ロール系切り離してもいいかも
@@ -214,15 +214,22 @@ users:
   - name: "ANALYST1"
   - name: "DEV1"
   - name: "DEV2"
-  - name: "dbt_user"
 
 rsa_user:
   - name: "AIRFLOW"
     login_name:  "AIRFLOW"
-    rsa_public_key: "/keys/rsa_key.pub" # rootからの相対パス
+    rsa_public_key: "/keys/rsa_key_airflow.pub" # rootからの相対パス
     default_role: "AIRFLOW_ROLE"
     default_warehouse: "TEST_WAREHOUSE"
     default_namespace: "TEST_DB.TEST_SCHEMA"
+  - name: "DBT_USER"
+    login_name: "DBT_USER"
+    password: "aaa"
+    rsa_public_key: "/keys/rsa_key_dbt.pub"
+    default_role: "DBT_ROLE"
+    default_warehouse: "TRANSFORMING"
+    default_namespace: "RAW.JAFFLE_SHOP"
+    
 # https://docs.snowflake.com/ja/user-guide/key-pair-auth
 
 # AIRFLOWに必要な権限情報参考：https://docs.snowflake.com/ja/user-guide/data-load-snowpipe-intro#pausing-or-resuming-pipes
@@ -238,17 +245,17 @@ account_grants_privileges:
     - "USAGE"
     object_type: "INTEGRATION"
     object_name: "TEST_STORAGE_INTEGRATION" 
-  - account_role_name: "dbt_role"
+  - account_role_name: "DBT_ROLE"
     privileges:
     - "USAGE"
     object_type: "WAREHOUSE"
-    object_name: "transforming"
+    object_name: "TRANSFORMING"
 
 grants_user_to_account:
   - role_name: "AIRFLOW_ROLE"
     user_name: "AIRFLOW"
-  - role_name: "dbt_role"
-    user_name: "dbt_user"
+  - role_name: "DBT_ROLE"
+    user_name: "DBT_USER"
 
 # データベースの権限付与
 # TODO:適切な粒度の検討。とりあえずは階層が深くなりすぎないように分割する。
@@ -258,8 +265,8 @@ database_grants_on_database:
     on_database: "TEST_DB"
     privileges:
       - USAGE
-  - database_role_name: "dbt_database_role"
-    on_database: "raw"
+  - database_role_name: "DBT_DATABASE_ROLE"
+    on_database: "RAW"
     privileges:
       - USAGE
 
@@ -269,16 +276,18 @@ database_grants_on_schema:
     on_schema: "TEST_SCHEMA" # TODO:ここでリストにした方がいいか?↓を見るにした方がよさそう（優先度低）
     privileges: 
       - USAGE
-  - database_role_name: "dbt_database_role"
-    on_database: "raw"
-    on_schema: "jaffle_shop"
+  - database_role_name: "DBT_DATABASE_ROLE"
+    on_database: "RAW"
+    on_schema: "JAFFLE_SHOP"
     privileges: 
       - USAGE
-  - database_role_name: "dbt_database_role"
-    on_database: "raw"
-    on_schema: "stripe"
+      - CREATE VIEW
+  - database_role_name: "DBT_DATABASE_ROLE"
+    on_database: "RAW"
+    on_schema: "STRIPE"
     privileges: 
       - USAGE
+      - CREATE VIEW # dbtでSELECTを行うとviewが作成されるため 
 
 # スキーマオブジェクトの権限付与
 # TODO:空のrole作成→権限付与とするべき？対応するリソースないと困る。
@@ -298,33 +307,33 @@ database_grants_in_schema:
         - SELECT
         - INSERT
       STAGES:
-        - USAGE # 外部ステージ(S3)のため。
+        - USAGE # 外部ステージ(S3)のため。内部ならRead
       FILE FORMATS:
         - USAGE  
       PIPES:
         - OPERATE
-  - database_role_name: "dbt_database_role"
-    database_name: "raw"
-    in_schema: "jaffle_shop"
+  - database_role_name: "DBT_DATABASE_ROLE"
+    database_name: "RAW"
+    in_schema: "JAFFLE_SHOP"
     object_privileges: 
       TABLES:
         - SELECT
         - INSERT
       STAGES:
-        - USAGE # 外部ステージ(S3)のため。
+        - USAGE
       FILE FORMATS:
         - USAGE  
       PIPES:
         - OPERATE
-  - database_role_name: "dbt_database_role"
-    database_name: "raw"
-    in_schema: "stripe"
+  - database_role_name: "DBT_DATABASE_ROLE"
+    database_name: "RAW"
+    in_schema: "STRIPE"
     object_privileges: 
       TABLES:
         - SELECT
         - INSERT
       STAGES:
-        - USAGE # 外部ステージ(S3)のため。
+        - USAGE
       FILE FORMATS:
         - USAGE  
       PIPES:
@@ -343,12 +352,12 @@ account_roles:
       - database: "TEST_DB"
         names:
         - "AIRFLOW_EXECUTE_PIPE"
-      - database: "raw"
+      - database: "RAW"
         names:
-        - "dbt_database_role"
-  - name: "dbt_role"
+        - "DBT_DATABASE_ROLE"
+  - name: "DBT_ROLE"
     comment: "DBT用. 権限付与はsnowsight上で行う。https://docs.snowflake.com/ja/user-guide/data-engineering/dbt-projects-on-snowflake-access-control の権限付与できるリソースが現状なさそう。"
     grants_database_roles:
-      - database: "raw"
+      - database: "RAW"
         names:
-        - "dbt_database_role"
+        - "DBT_DATABASE_ROLE"

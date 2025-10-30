@@ -16,6 +16,10 @@ resource "snowflake_pipe" "pipe" {
     target_table = each.value.target_table
     target_format_name = each.value.target_format_name
   })
+  # accountadminに権限がない(移譲済みの)ため変更しない。追加は可能にするためにnameだけ監視する。
+  lifecycle {
+    ignore_changes = [database, schema, comment, auto_ingest, copy_statement]
+  }
 }
 
 # https://registry.terraform.io/providers/snowflakedb/snowflake/latest/docs/resources/pipe
