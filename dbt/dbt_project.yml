@@ -6,4 +6,4 @@ model-paths: ["models"]
 # dbtをUbuntu上で実行しており、そちら(\\wsl$\Ubuntu\home\username\.dbt)にprofiles.ymlを置いている(そっちでinitした)ため、
 # dbt1005: No profiles.yml found at pathが出力される
 # おいたらおいたでこっちを優先して見たうえでJWTが有効でないとか言ってくるため放置
-# Ubuntu上で実行する分には支障ない
+# mountしてUbuntu上で実行する分には支障ない
