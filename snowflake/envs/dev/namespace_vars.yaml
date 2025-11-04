@@ -4,7 +4,7 @@ IAM:
 # TODO:完全修飾をこのyaml上でやってるやつとtfでやってるやつがある。混乱を招きそうなので統一したい。
 # tfでやるとsnowflake側で実行エラー(terraformで特定できない)になる可能性ある模様。可能ならここで完全修飾必要ならやっとく。
 # TODO:内容の分割と配置場所の検討。ごちゃごちゃしてる。
-# TODO:これリソース名とか小文字がよかった。SQL内で予約語と区別できない。
+# TODO:これリソース名とか小文字がよかった。SQL内で予約語と区別できない。→修正済み
 warehouses:
   - name: "TEST_WAREHOUSE"
     warehouse_size: "XSMALL"
@@ -258,7 +258,7 @@ grants_user_to_account:
     user_name: "DBT_USER"
 
 # データベースの権限付与
-# TODO:適切な粒度の検討。とりあえずは階層が深くなりすぎないように分割する。
+# TODO:適切な名前空間の粒度検討。とりあえずは階層が深くなりすぎないように分割する。
 
 database_grants_on_database:
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
@@ -273,7 +273,7 @@ database_grants_on_database:
 database_grants_on_schema:
   - database_role_name: "AIRFLOW_EXECUTE_PIPE"
     on_database: "TEST_DB" # roleもschemaも完全修飾名のため設定。
-    on_schema: "TEST_SCHEMA" # TODO:ここでリストにした方がいいか?↓を見るにした方がよさそう（優先度低）
+    on_schema: "TEST_SCHEMA" # TODO:スキーマ単位でリストにした方がいいか?↓を見るにした方がよさそう（優先度低）
     privileges: 
       - USAGE
   - database_role_name: "DBT_DATABASE_ROLE"
@@ -281,13 +281,15 @@ database_grants_on_schema:
     on_schema: "JAFFLE_SHOP"
     privileges: 
       - USAGE
-      - CREATE VIEW
+      - CREATE VIEW  # dbtで使用 
+      - CREATE TABLE # dbtでS使用
   - database_role_name: "DBT_DATABASE_ROLE"
     on_database: "RAW"
     on_schema: "STRIPE"
     privileges: 
       - USAGE
-      - CREATE VIEW # dbtでSELECTを行うとviewが作成されるため 
+      - CREATE VIEW 
+      - CREATE TABLE 
 
 # スキーマオブジェクトの権限付与
 # TODO:空のrole作成→権限付与とするべき？対応するリソースないと困る。
@@ -356,7 +358,7 @@ account_roles:
         names:
         - "DBT_DATABASE_ROLE"
   - name: "DBT_ROLE"
-    comment: "DBT用. 権限付与はsnowsight上で行う。https://docs.snowflake.com/ja/user-guide/data-engineering/dbt-projects-on-snowflake-access-control の権限付与できるリソースが現状なさそう。"
+    comment: "DBT用. 権限付与はsnowsight上で行う。https://docs.snowflake.com/ja/user-guide/data-engineering/dbt-projects-on-snowflake-access-control の権限付与できるリソースが現状なさそう。→dbt Coreに関しては別にこれいらなさそう。CREATE VIEW権限でSELECTは普通にできた。"
     grants_database_roles:
       - database: "RAW"
         names:
